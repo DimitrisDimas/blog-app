@@ -1,5 +1,6 @@
 package com.springboot.blog.blog_rest_api.controller;
 
+import com.springboot.blog.blog_rest_api.dto.LoginDto;
 import com.springboot.blog.blog_rest_api.dto.RegisterDto;
 import com.springboot.blog.blog_rest_api.service.AuthService;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,14 @@ public class AuthController {
     public ResponseEntity<String> register(@RequestBody RegisterDto registerDto){
         String response = authService.register(registerDto);
         return new ResponseEntity(response, HttpStatus.CREATED);
+    }
+
+
+    //Build Login Rest API
+    @PostMapping(value = {"/login","/signin"})
+    public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
+        String response = authService.login(loginDto);
+        return ResponseEntity.ok(response);
     }
 
 

@@ -1,11 +1,18 @@
 package com.springboot.blog.blog_rest_api.service.impl;
 
+import com.springboot.blog.blog_rest_api.dto.LoginDto;
 import com.springboot.blog.blog_rest_api.dto.RegisterDto;
 import com.springboot.blog.blog_rest_api.entity.Role;
 import com.springboot.blog.blog_rest_api.entity.User;
 import com.springboot.blog.blog_rest_api.repository.RoleRepository;
 import com.springboot.blog.blog_rest_api.repository.UserRepository;
 import com.springboot.blog.blog_rest_api.service.AuthService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -14,12 +21,19 @@ import java.util.Set;
 @Service
 public class AuthServiceImpl implements AuthService {
 
+    private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
     private RoleRepository roleRepository;
+    private PasswordEncoder passwordEncoder;
 
-    public AuthServiceImpl(UserRepository userRepository, RoleRepository roleRepository) {
+    public AuthServiceImpl(AuthenticationManager authenticationManager,
+                           UserRepository userRepository,
+                           RoleRepository roleRepository,
+                           PasswordEncoder passwordEncoder) {
+        this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -31,8 +45,7 @@ public class AuthServiceImpl implements AuthService {
         user.setName(registerDto.getName());
         user.setUsername(registerDto.getUsername());
         user.setEmail(registerDto.getEmail());
-        user.setPassword(registerDto.getPassword());
-
+        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         Set<Role> roles = new HashSet<>();
         Role userRole = roleRepository.findByName("ROLE_USER").get();
         roles.add(userRole);
@@ -41,5 +54,16 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
 
         return "User registered successfully";
+    }
+
+    @Override
+    public String login(LoginDto loginDto) {
+
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                loginDto.getUsernameOrEmail(),loginDto.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return "User Logged-in successfully!!!";
     }
 }
