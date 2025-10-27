@@ -10,9 +10,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class BlogRestApiApplication implements CommandLineRunner {
 
-	public static void main(String[] args) {
-		SpringApplication.run(BlogRestApiApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(BlogRestApiApplication.class, args);
+    }
 
 
     @Autowired
@@ -20,13 +20,16 @@ public class BlogRestApiApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Role adminRole = new Role();
-        adminRole.setName("ROLE_ADMIN");
-        roleRepository.save(adminRole);
+        addRoleIfNotExists("ROLE_ADMIN");
+        addRoleIfNotExists("ROLE_USER");
+    }
 
-        Role userRole = new Role();
-        userRole.setName("ROLE_USER");
-        roleRepository.save(userRole);
+    private void addRoleIfNotExists(String roleName) {
+        if (!roleRepository.existsByName(roleName)) {
+            Role role = new Role();
+            role.setName(roleName);
+            roleRepository.save(role);
+        }
     }
 
 }
