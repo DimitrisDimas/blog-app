@@ -3,6 +3,7 @@ package com.springboot.blog.blog_rest_api.service.impl;
 import com.springboot.blog.blog_rest_api.dto.PostDto;
 import com.springboot.blog.blog_rest_api.dto.PostResponse;
 import com.springboot.blog.blog_rest_api.entity.Post;
+import com.springboot.blog.blog_rest_api.exception.ResourceNotFoundException;
 import com.springboot.blog.blog_rest_api.repository.PostRepository;
 import com.springboot.blog.blog_rest_api.service.PostService;
 import org.modelmapper.ModelMapper;
@@ -39,6 +40,13 @@ public class PostServiceImpl implements PostService {
         PostResponse postResponse = new PostResponse();
         postResponse.setContent(content);
         return postResponse;
+    }
+
+    @Override
+    public PostDto getPostById(long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
+        return mapToDTO(post);
     }
 
 

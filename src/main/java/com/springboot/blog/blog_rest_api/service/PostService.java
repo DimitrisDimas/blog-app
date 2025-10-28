@@ -7,4 +7,6 @@ public interface PostService {
     PostDto createPost(PostDto postDto);
 
     PostResponse getAllPosts();
+
+    PostDto getPostById(long id);
 }
