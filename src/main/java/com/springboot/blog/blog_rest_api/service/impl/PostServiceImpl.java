@@ -1,11 +1,16 @@
 package com.springboot.blog.blog_rest_api.service.impl;
 
 import com.springboot.blog.blog_rest_api.dto.PostDto;
+import com.springboot.blog.blog_rest_api.dto.PostResponse;
 import com.springboot.blog.blog_rest_api.entity.Post;
 import com.springboot.blog.blog_rest_api.repository.PostRepository;
 import com.springboot.blog.blog_rest_api.service.PostService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -24,6 +29,16 @@ public class PostServiceImpl implements PostService {
         Post post = mapToEntity(postDto);
         Post newPost = postRepository.save(post);
         return mapToDTO(newPost);
+    }
+
+    @Override
+    public PostResponse getAllPosts() {
+
+        List<Post> listOfPosts = postRepository.findAll();
+        List<PostDto> content = listOfPosts.stream().map(this::mapToDTO).collect(Collectors.toList());
+        PostResponse postResponse = new PostResponse();
+        postResponse.setContent(content);
+        return postResponse;
     }
 
 
