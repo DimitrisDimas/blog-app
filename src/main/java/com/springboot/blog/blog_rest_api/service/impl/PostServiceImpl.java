@@ -6,7 +6,7 @@ import com.springboot.blog.blog_rest_api.repository.PostRepository;
 import com.springboot.blog.blog_rest_api.service.PostService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.ModelMap;
+
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -18,7 +18,15 @@ public class PostServiceImpl implements PostService {
         this.postRepository = postRepository;
     }
 
-    
+    @Override
+    public PostDto createPost(PostDto postDto) {
+
+        Post post = mapToEntity(postDto);
+        Post newPost = postRepository.save(post);
+        return mapToDTO(newPost);
+    }
+
+
     // --- Mapping helpers ---
     private PostDto mapToDTO(Post post) {
 
@@ -30,6 +38,5 @@ public class PostServiceImpl implements PostService {
         Post post = mapper.map(postDto, Post.class);
         return post;
     }
-
 
 }
