@@ -1,11 +1,13 @@
 package com.springboot.blog.blog_rest_api.controller;
 
+import com.springboot.blog.blog_rest_api.dto.CommentDto;
 import com.springboot.blog.blog_rest_api.service.CommentService;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping
+@RequestMapping("api/posts/{post_id}/comments")
 public class CommentController {
 
     private CommentService commentService;
@@ -13,4 +15,14 @@ public class CommentController {
     public CommentController(CommentService commentService) {
         this.commentService = commentService;
     }
+
+
+    // create comment post REST API
+    @PostMapping
+    public ResponseEntity<CommentDto> createComment(@PathVariable(value ="post_id")long post_id ,@RequestBody CommentDto commentDto){
+        return new ResponseEntity<>(commentService.createComment(post_id,commentDto), HttpStatus.CREATED);
+    }
+
+
+
 }
