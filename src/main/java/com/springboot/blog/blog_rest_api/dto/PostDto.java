@@ -1,6 +1,7 @@
 package com.springboot.blog.blog_rest_api.dto;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -23,7 +24,7 @@ public class PostDto {
     @Size(min = 10, message = "Post content should have at least 10 characters")
     private String content;
     private Set<CommentDto> comments;
-    @NotEmpty
+    @NotNull
     private Long categoryId;
 
 
