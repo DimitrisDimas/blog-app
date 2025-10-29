@@ -1,6 +1,8 @@
 package com.springboot.blog.blog_rest_api.service.impl;
 
 
+import com.springboot.blog.blog_rest_api.dto.CategoryDto;
+import com.springboot.blog.blog_rest_api.entity.Category;
 import com.springboot.blog.blog_rest_api.repository.CategoryRepository;
 import com.springboot.blog.blog_rest_api.service.CategoryService;
 import org.modelmapper.ModelMapper;
@@ -15,5 +17,26 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper mapper) {
         this.categoryRepository = categoryRepository;
         this.mapper = mapper;
+    }
+
+    @Override
+    public CategoryDto addCategory(CategoryDto categoryDto) {
+
+        Category category = mapToEntity(categoryDto);
+        Category savedCategory = categoryRepository.save(category);
+        return mapToDto(savedCategory);
+    }
+
+
+
+    private CategoryDto mapToDto(Category category){
+        CategoryDto categoryDto = mapper.map(category,CategoryDto.class);
+        return categoryDto;
+
+    }
+
+    private Category mapToEntity(CategoryDto CategoryDto){
+        Category category = mapper.map(CategoryDto,Category.class);
+        return category;
     }
 }
