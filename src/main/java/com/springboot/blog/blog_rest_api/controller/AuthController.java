@@ -32,7 +32,7 @@ public class AuthController {
 
     //Build Login Rest API
     @PostMapping(value = {"/login","/signin"})
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
+    public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginDto){
         String response = authService.login(loginDto);
         return ResponseEntity.ok(response);
     }
