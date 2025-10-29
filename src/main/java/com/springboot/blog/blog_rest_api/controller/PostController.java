@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/posts")
 public class PostController {
@@ -47,6 +49,14 @@ public class PostController {
     public ResponseEntity<String> deletePost(@PathVariable(name="id") long id){
         postService.deletePostById(id);
         return new ResponseEntity<>("Post entity deleted successfully",HttpStatus.OK);
+    }
+
+
+    //Build get Posts by category rest API
+    @GetMapping("/category/{category_id}")
+    public ResponseEntity<List<PostDto>> getPostsByCategory(@PathVariable("category_id") long category_id){
+        List<PostDto> posts = postService.getPostsByCategory(category_id);
+        return ResponseEntity.ok(posts);
     }
 
 
