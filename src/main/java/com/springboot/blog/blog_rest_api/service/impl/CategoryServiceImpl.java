@@ -59,6 +59,13 @@ public class CategoryServiceImpl implements CategoryService {
         return mapToDto(categoryUpdated);
     }
 
+    @Override
+    public void deleteCategory(long category_id) {
+        Category category = categoryRepository.findById(category_id).orElseThrow(()->new ResourceNotFoundException("Category","id",category_id));
+        categoryRepository.delete(category);
+    }
+
+
 
     private CategoryDto mapToDto(Category category){
         CategoryDto categoryDto = mapper.map(category,CategoryDto.class);
