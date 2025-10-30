@@ -3,6 +3,7 @@ package com.springboot.blog.blog_rest_api.controller;
 import com.springboot.blog.blog_rest_api.dto.LoginDto;
 import com.springboot.blog.blog_rest_api.dto.RegisterDto;
 import com.springboot.blog.blog_rest_api.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +24,7 @@ public class AuthController {
 
     //Build Register/Sign Up Rest API
     @PostMapping(value = {"/register","/signup"})
-    public ResponseEntity<String> register(@RequestBody RegisterDto registerDto){
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterDto registerDto){
         String response = authService.register(registerDto);
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
@@ -31,7 +32,7 @@ public class AuthController {
 
     //Build Login Rest API
     @PostMapping(value = {"/login","/signin"})
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
+    public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginDto){
         String response = authService.login(loginDto);
         return ResponseEntity.ok(response);
     }

@@ -2,6 +2,7 @@ package com.springboot.blog.blog_rest_api.controller;
 
 import com.springboot.blog.blog_rest_api.dto.CategoryDto;
 import com.springboot.blog.blog_rest_api.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class CategoryController {
 
     //Build add Category Rest API
     @PostMapping
-    public ResponseEntity<CategoryDto> addCategory(@RequestBody CategoryDto categoryDto){
+    public ResponseEntity<CategoryDto> addCategory(@Valid @RequestBody CategoryDto categoryDto){
         CategoryDto savedCategory = categoryService.addCategory(categoryDto);
         return new ResponseEntity<>(savedCategory, HttpStatus.CREATED);
     }
@@ -44,7 +45,7 @@ public class CategoryController {
     @PutMapping("/{category_id}")
     public ResponseEntity<CategoryDto> updateCategory(
             @PathVariable("category_id") long category_id,
-            @RequestBody CategoryDto categoryDto) {
+            @Valid @RequestBody CategoryDto categoryDto) {
 
         CategoryDto updatedCategory = categoryService.updateCategory(categoryDto, category_id);
         return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
