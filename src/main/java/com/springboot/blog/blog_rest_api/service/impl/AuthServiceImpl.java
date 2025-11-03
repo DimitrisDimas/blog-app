@@ -6,6 +6,7 @@ import com.springboot.blog.blog_rest_api.entity.Role;
 import com.springboot.blog.blog_rest_api.entity.User;
 import com.springboot.blog.blog_rest_api.repository.RoleRepository;
 import com.springboot.blog.blog_rest_api.repository.UserRepository;
+import com.springboot.blog.blog_rest_api.security.JwtTokenProvider;
 import com.springboot.blog.blog_rest_api.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,15 +26,18 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
+    private JwtTokenProvider jwtTokenProvider;
 
     public AuthServiceImpl(AuthenticationManager authenticationManager,
                            UserRepository userRepository,
                            RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
@@ -64,6 +68,8 @@ public class AuthServiceImpl implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return "User Logged-in successfully!!!";
+        String token = jwtTokenProvider.generateToken(authentication);
+
+        return token;
     }
 }
