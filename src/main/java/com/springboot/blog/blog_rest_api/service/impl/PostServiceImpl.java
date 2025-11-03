@@ -10,6 +10,9 @@ import com.springboot.blog.blog_rest_api.repository.PostRepository;
 import com.springboot.blog.blog_rest_api.service.PostService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,12 +43,29 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse getAllPosts() {
+    public PostResponse getAllPosts(int pageNo, int pageSize, String sortBy, String sortDir) {
 
-        List<Post> listOfPosts = postRepository.findAll();
-        List<PostDto> content = listOfPosts.stream().map(this::mapToDTO).collect(Collectors.toList());
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        // create Pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<Post> posts = postRepository.findAll(pageable);
+
+        // get content for page object
+        List<Post> listOfPosts = posts.getContent();
+
+        List<PostDto> content= listOfPosts.stream().map(post -> mapToDTO(post)).collect(Collectors.toList());
+
         PostResponse postResponse = new PostResponse();
         postResponse.setContent(content);
+        postResponse.setPageNo(posts.getNumber());
+        postResponse.setPageSize(posts.getSize());
+        postResponse.setTotalElements(posts.getTotalElements());
+        postResponse.setTotalPages(posts.getTotalPages());
+        postResponse.setLast(posts.isLast());
+
         return postResponse;
     }
 
