@@ -2,11 +2,19 @@ package com.springboot.blog.blog_rest_api.service.impl;
 
 
 import com.springboot.blog.blog_rest_api.dto.CategoryDto;
+import com.springboot.blog.blog_rest_api.dto.CategoryResponse;
+import com.springboot.blog.blog_rest_api.dto.CommentDto;
+import com.springboot.blog.blog_rest_api.dto.CommentResponse;
 import com.springboot.blog.blog_rest_api.entity.Category;
+import com.springboot.blog.blog_rest_api.entity.Comment;
 import com.springboot.blog.blog_rest_api.exception.ResourceNotFoundException;
 import com.springboot.blog.blog_rest_api.repository.CategoryRepository;
 import com.springboot.blog.blog_rest_api.service.CategoryService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,10 +46,31 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryDto> getAllCategories() {
+    public CategoryResponse getAllCategories(int pageNo, int pageSize, String sortBy, String sortDir) {
 
-        List<Category> categories = categoryRepository.findAll();
-        return categories.stream().map(category -> mapToDto(category)).collect(Collectors.toList());
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        // create Pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<Category> categories = categoryRepository.findAll(pageable);
+
+        // get content for page object
+        List<Category> listsOfCategories = categories.getContent();
+
+        List<CategoryDto> content= listsOfCategories.stream().map(category -> mapToDto(category)).collect(Collectors.toList());
+
+        CategoryResponse categoryResponse = new CategoryResponse();
+        categoryResponse.setContent(content);
+        categoryResponse.setPageNo(categories.getNumber());
+        categoryResponse.setPageSize(categories.getSize());
+        categoryResponse.setTotalElements(categories.getTotalElements());
+        categoryResponse.setTotalPages(categories.getTotalPages());
+        categoryResponse.setLast(categories.isLast());
+
+        return categoryResponse;
+        
     }
 
     @Override
