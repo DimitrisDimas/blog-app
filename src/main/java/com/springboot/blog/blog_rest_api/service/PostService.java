@@ -16,5 +16,5 @@ public interface PostService {
 
     void deletePostById(long id);
 
-    List<PostDto> getPostsByCategory(long categoryId);
+    PostResponse getPostsByCategory(long categoryId, int pageNo,int pageSize , String sortBy, String sortDir);
 }

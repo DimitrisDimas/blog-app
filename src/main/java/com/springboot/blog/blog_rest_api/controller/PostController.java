@@ -61,9 +61,14 @@ public class PostController {
 
     //Build get Posts by category rest API
     @GetMapping("/category/{category_id}")
-    public ResponseEntity<List<PostDto>> getPostsByCategory(@PathVariable("category_id") long category_id){
-        List<PostDto> posts = postService.getPostsByCategory(category_id);
-        return ResponseEntity.ok(posts);
+    public PostResponse getPostsByCategory(@PathVariable("category_id") long category_id,
+                                           @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+                                           @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+                                           @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+                                           @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
+    ){
+        PostResponse post = postService.getPostsByCategory(category_id ,pageNo, pageSize, sortBy, sortDir);
+        return ResponseEntity.ok(post).getBody();
     }
 
 

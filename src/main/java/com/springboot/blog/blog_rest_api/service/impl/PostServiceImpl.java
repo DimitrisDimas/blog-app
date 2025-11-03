@@ -101,13 +101,35 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getPostsByCategory(long categoryId) {
-        Category category = categoryRepository.findById(categoryId).orElseThrow(()->new ResourceNotFoundException("Category","id",categoryId));
+    public PostResponse getPostsByCategory(long categoryId, int pageNo, int pageSize, String sortBy, String sortDir) {
 
-        List<Post> posts = postRepository.findByCategoryId(categoryId);
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category","id",categoryId));
 
-        return posts.stream().map((post)->mapToDTO(post)).collect(Collectors.toList());
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<Post> posts = postRepository.findByCategoryId(categoryId, pageable);
+
+        List<PostDto> content = posts.getContent()
+                .stream()
+                .map(post -> mapToDTO(post))
+                .collect(Collectors.toList());
+
+        PostResponse postResponse = new PostResponse();
+        postResponse.setContent(content);
+        postResponse.setPageNo(posts.getNumber());
+        postResponse.setPageSize(posts.getSize());
+        postResponse.setTotalElements(posts.getTotalElements());
+        postResponse.setTotalPages(posts.getTotalPages());
+        postResponse.setLast(posts.isLast());
+
+        return postResponse;
     }
+
 
 
     // --- Mapping helpers ---
