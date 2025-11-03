@@ -1,7 +1,9 @@
 package com.springboot.blog.blog_rest_api.controller;
 
 import com.springboot.blog.blog_rest_api.dto.CommentDto;
+import com.springboot.blog.blog_rest_api.dto.CommentResponse;
 import com.springboot.blog.blog_rest_api.service.CommentService;
+import com.springboot.blog.blog_rest_api.utils.AppConstants;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +30,12 @@ public class CommentController {
 
     // get all comments by one Post
     @GetMapping()
-    public List<CommentDto> getCommentsByPostId(@PathVariable(value = "post_id") Long post_id){
-        return commentService.getCommentsByPostId(post_id);
+    public CommentResponse getCommentsByPostId(@PathVariable(value = "post_id") Long post_id, @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+                                               @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+                                               @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+                                               @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
+    ){
+        return commentService.getCommentsByPostId(post_id,pageNo, pageSize, sortBy, sortDir);
     }
 
     // get comment by post id with comment id
