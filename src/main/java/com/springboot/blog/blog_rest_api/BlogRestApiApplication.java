@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class BlogRestApiApplication implements CommandLineRunner {
+public class BlogRestApiApplication {
 
     @Bean
     public ModelMapper modelMapper(){return new ModelMapper();}
@@ -21,21 +21,6 @@ public class BlogRestApiApplication implements CommandLineRunner {
     }
 
 
-    @Autowired
-    private RoleRepository roleRepository;
 
-    @Override
-    public void run(String... args) throws Exception {
-        addRoleIfNotExists("ROLE_ADMIN");
-        addRoleIfNotExists("ROLE_USER");
-    }
-
-    private void addRoleIfNotExists(String roleName) {
-        if (!roleRepository.existsByName(roleName)) {
-            Role role = new Role();
-            role.setName(roleName);
-            roleRepository.save(role);
-        }
-    }
 
 }
