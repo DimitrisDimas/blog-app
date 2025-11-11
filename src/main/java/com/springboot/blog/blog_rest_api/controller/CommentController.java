@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/posts/{post_id}/comments")
+@RequestMapping("/api/posts/{post_id}/comments")
 @Tag( name = "REST APIs for Comment Resource" )
 public class CommentController {
 
