@@ -35,7 +35,7 @@ public class CategoryControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    public void testAddCategory() throws Exception {
+    public void testAddValidCategory() throws Exception {
         // Arrange
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setName("Tech");
@@ -58,4 +58,25 @@ public class CategoryControllerTest {
                 .andExpect(jsonPath("$.name").value("Tech"))
                 .andExpect(jsonPath("$.description").value("Tech category"));
     }
+
+    @Test
+    public void testAddInvalidCategory_MissingName() throws Exception {
+        // Arrange
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setDescription("Tech category"); // Missing name
+
+        // Act & Assert
+        mockMvc.perform(post("/api/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(categoryDto)))
+                .andExpect(status().isBadRequest());
+    }
+
+
+
+
+
+
+
+
 }
