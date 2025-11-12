@@ -174,6 +174,41 @@ public class PostControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Post entity deleted successfully"));
     }
+
+    @Test
+    public void testUpdatePost_ValidRequest_ReturnsUpdatedPost() throws Exception {
+        // Arrange
+        long postId = 1L;
+
+        PostDto postDto = new PostDto();
+        postDto.setTitle("Updated Title");
+        postDto.setDescription("Updated description for the post.");
+        postDto.setContent("Updated content of the post.");
+        postDto.setCategoryId(1L);
+
+        PostDto updatedPost = new PostDto();
+        updatedPost.setId(postId);
+        updatedPost.setTitle(postDto.getTitle());
+        updatedPost.setDescription(postDto.getDescription());
+        updatedPost.setContent(postDto.getContent());
+        updatedPost.setCategoryId(postDto.getCategoryId());
+
+        // Mock service
+        Mockito.when(postService.updatePost(Mockito.any(PostDto.class), Mockito.eq(postId)))
+                .thenReturn(updatedPost);
+
+        // Act & Assert
+        mockMvc.perform(put("/api/posts/{id}", postId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(postDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(postId))
+                .andExpect(jsonPath("$.title").value("Updated Title"))
+                .andExpect(jsonPath("$.description").value("Updated description for the post."))
+                .andExpect(jsonPath("$.content").value("Updated content of the post."))
+                .andExpect(jsonPath("$.categoryId").value(1));
+    }
+
     // ----------- Invalid Test -----------
     @Test
     public void testCreatePost_InvalidRequest_ReturnsBadRequest() throws Exception {
@@ -219,6 +254,28 @@ public class PostControllerTest {
         // Act & Assert
         mockMvc.perform(delete("/api/posts/{id}", invalidPostId)
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testUpdatePost_InvalidId_ReturnsNotFound() throws Exception {
+        // Arrange
+        long invalidPostId = 999L;
+
+        PostDto postDto = new PostDto();
+        postDto.setTitle("Updated Title");
+        postDto.setDescription("Updated description");
+        postDto.setContent("Updated content");
+        postDto.setCategoryId(1L);
+
+        // Mock service to throw exception
+        Mockito.when(postService.updatePost(Mockito.any(PostDto.class), Mockito.eq(invalidPostId)))
+                .thenThrow(new ResourceNotFoundException("Post","id",invalidPostId));
+
+        // Act & Assert
+        mockMvc.perform(put("/api/posts/{id}", invalidPostId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(postDto)))
                 .andExpect(status().isNotFound());
     }
 }
