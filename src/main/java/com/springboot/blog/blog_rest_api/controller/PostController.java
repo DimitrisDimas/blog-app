@@ -2,6 +2,7 @@ package com.springboot.blog.blog_rest_api.controller;
 
 import com.springboot.blog.blog_rest_api.dto.PostDto;
 import com.springboot.blog.blog_rest_api.dto.PostResponse;
+import com.springboot.blog.blog_rest_api.exception.ResourceNotFoundException;
 import com.springboot.blog.blog_rest_api.service.PostService;
 import com.springboot.blog.blog_rest_api.utils.AppConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -85,6 +86,9 @@ public class PostController {
                                            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
     ){
         PostResponse post = postService.getPostsByCategory(category_id ,pageNo, pageSize, sortBy, sortDir);
+        if (post == null || post.getContent().isEmpty()) {
+            throw new ResourceNotFoundException("Category","id",category_id);
+        }
         return ResponseEntity.ok(post).getBody();
     }
 

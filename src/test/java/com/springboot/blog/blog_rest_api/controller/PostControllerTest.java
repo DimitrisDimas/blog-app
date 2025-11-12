@@ -209,6 +209,65 @@ public class PostControllerTest {
                 .andExpect(jsonPath("$.categoryId").value(1));
     }
 
+    @Test
+    public void testGetPostsByCategory_ValidCategory_ReturnsPosts() throws Exception {
+        // Arrange
+        long categoryId = 1L;
+        int pageNo = 0;
+        int pageSize = 2;
+        String sortBy = "title";
+        String sortDir = "asc";
+
+        // Mock posts
+        PostDto post1 = new PostDto();
+        post1.setId(1L);
+        post1.setTitle("Post 1");
+        post1.setDescription("Description 1");
+        post1.setContent("Content 1");
+        post1.setCategoryId(categoryId);
+
+        PostDto post2 = new PostDto();
+        post2.setId(2L);
+        post2.setTitle("Post 2");
+        post2.setDescription("Description 2");
+        post2.setContent("Content 2");
+        post2.setCategoryId(categoryId);
+
+        List<PostDto> posts = Arrays.asList(post1, post2);
+
+        PostResponse postResponse = new PostResponse();
+        postResponse.setContent(posts);
+        postResponse.setPageNo(pageNo);
+        postResponse.setPageSize(pageSize);
+        postResponse.setTotalElements(2L);
+        postResponse.setTotalPages(1);
+        postResponse.setLast(true);
+
+        // Mock service
+        Mockito.when(postService.getPostsByCategory(categoryId, pageNo, pageSize, sortBy, sortDir))
+                .thenReturn(postResponse);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/posts/category/{category_id}", categoryId)
+                        .param("pageNo", String.valueOf(pageNo))
+                        .param("pageSize", String.valueOf(pageSize))
+                        .param("sortBy", sortBy)
+                        .param("sortDir", sortDir)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].title").value("Post 1"))
+                .andExpect(jsonPath("$.content[1].id").value(2))
+                .andExpect(jsonPath("$.content[1].title").value("Post 2"))
+                .andExpect(jsonPath("$.pageNo").value(pageNo))
+                .andExpect(jsonPath("$.pageSize").value(pageSize))
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.last").value(true));
+    }
+
     // ----------- Invalid Test -----------
     @Test
     public void testCreatePost_InvalidRequest_ReturnsBadRequest() throws Exception {
@@ -276,6 +335,23 @@ public class PostControllerTest {
         mockMvc.perform(put("/api/posts/{id}", invalidPostId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(postDto)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testGetPostsByCategory_InvalidCategory_ReturnsNotFound() throws Exception {
+        // Arrange
+        long invalidCategoryId = 999L;
+        int pageNo = 0;
+        int pageSize = 10;
+
+        // Mock service to throw exception
+        Mockito.when(postService.getPostsByCategory(invalidCategoryId, pageNo, pageSize, "title", "asc"))
+                .thenThrow(new ResourceNotFoundException("Post","id",invalidCategoryId));
+
+        // Act & Assert
+        mockMvc.perform(get("/api/posts/category/{category_id}", invalidCategoryId)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 }
