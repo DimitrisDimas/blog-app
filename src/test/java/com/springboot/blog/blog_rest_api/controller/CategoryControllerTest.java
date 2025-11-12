@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,9 +35,11 @@ public class CategoryControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    //Valid Test
+
     @Test
     public void testAddValidCategory() throws Exception {
-        // Arrange
+
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setName("Tech");
         categoryDto.setDescription("Tech category");
@@ -60,6 +63,30 @@ public class CategoryControllerTest {
     }
 
     @Test
+    public void testGetCategoryByValidId_ReturnsCategory() throws Exception {
+        // Arrange
+        long categoryId = 1L;
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setId(categoryId);
+        categoryDto.setName("Tech");
+        categoryDto.setDescription("Tech category");
+
+        // Mock the service
+        Mockito.when(categoryService.getCategory(categoryId)).thenReturn(categoryDto);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/categories/{category_id}", categoryId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(categoryId))
+                .andExpect(jsonPath("$.name").value("Tech"))
+                .andExpect(jsonPath("$.description").value("Tech category"));
+    }
+
+    
+    //Invalid Test
+
+    @Test
     public void testAddInvalidCategory_MissingName() throws Exception {
         // Arrange
         CategoryDto categoryDto = new CategoryDto();
@@ -71,7 +98,6 @@ public class CategoryControllerTest {
                         .content(objectMapper.writeValueAsString(categoryDto)))
                 .andExpect(status().isBadRequest());
     }
-
 
 
 
