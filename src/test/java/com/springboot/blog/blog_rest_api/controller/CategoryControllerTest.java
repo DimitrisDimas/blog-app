@@ -22,6 +22,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -143,6 +144,34 @@ public class CategoryControllerTest {
                 .andExpect(jsonPath("$.last").value(true));
     }
 
+    @Test
+    public void testUpdateCategory_ValidRequest_ReturnsUpdatedCategory() throws Exception {
+        // Arrange
+        long categoryId = 1L;
+
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setName("Tech");
+        categoryDto.setDescription("Updated tech category");
+
+        CategoryDto updatedCategory = new CategoryDto();
+        updatedCategory.setId(categoryId);
+        updatedCategory.setName("Updated Tech");
+        updatedCategory.setDescription("Updated tech category");
+
+        // Mock service
+        Mockito.when(categoryService.updateCategory(Mockito.any(CategoryDto.class), Mockito.eq(categoryId)))
+                .thenReturn(updatedCategory);
+
+        // Act & Assert
+        mockMvc.perform(put("/api/categories/{category_id}", categoryId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(categoryDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(categoryId))
+                .andExpect(jsonPath("$.name").value("Updated Tech"))
+                .andExpect(jsonPath("$.description").value("Updated tech category"));
+    }
+
     //Invalid Test
 
     @Test
@@ -173,6 +202,25 @@ public class CategoryControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    public void testUpdateCategory_InvalidCategoryId_ReturnsNotFound() throws Exception {
+        // Arrange
+        long invalidCategoryId = 999L;
+
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setName("Updated Tech");
+        categoryDto.setDescription("Updated tech category");
+
+        // Mock service to throw exception
+        Mockito.when(categoryService.updateCategory(Mockito.any(CategoryDto.class), Mockito.eq(invalidCategoryId)))
+                .thenThrow(new ResourceNotFoundException("Category","id",invalidCategoryId));
+
+        // Act & Assert
+        mockMvc.perform(put("/api/categories/{category_id}", invalidCategoryId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(categoryDto)))
+                .andExpect(status().isNotFound());
+    }
 
 
 
