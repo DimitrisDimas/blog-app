@@ -23,8 +23,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CategoryController.class)
 @AutoConfigureMockMvc(addFilters = false) // Disable Spring Security filters
@@ -172,6 +172,22 @@ public class CategoryControllerTest {
                 .andExpect(jsonPath("$.description").value("Updated tech category"));
     }
 
+    @Test
+    public void testDeleteCategory_ValidId_ReturnsSuccessMessage() throws Exception {
+        // Arrange
+        long categoryId = 1L;
+
+        // Mock service to do nothing (void method)
+        Mockito.doNothing().when(categoryService).deleteCategory(categoryId);
+
+        // Act & Assert
+        mockMvc.perform(delete("/api/categories/{category_id}", categoryId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Category deleted successfully!!!"));
+    }
+
+
     //Invalid Test
 
     @Test
@@ -219,6 +235,21 @@ public class CategoryControllerTest {
         mockMvc.perform(put("/api/categories/{category_id}", invalidCategoryId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(categoryDto)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testDeleteCategory_InvalidId_ReturnsNotFound() throws Exception {
+        // Arrange
+        long invalidCategoryId = 999L;
+
+        // Mock the service to throw ResourceNotFoundException
+        Mockito.doThrow(new ResourceNotFoundException("Category","id",invalidCategoryId))
+                .when(categoryService).deleteCategory(invalidCategoryId);
+
+        // Act & Assert
+        mockMvc.perform(delete("/api/categories/{category_id}", invalidCategoryId)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
