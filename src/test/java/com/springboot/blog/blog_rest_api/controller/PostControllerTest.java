@@ -160,6 +160,20 @@ public class PostControllerTest {
                 .andExpect(jsonPath("$.categoryId").value(1));
     }
 
+    @Test
+    public void testDeletePost_ValidId_ReturnsSuccessMessage() throws Exception {
+        // Arrange
+        long postId = 1L;
+
+        // Mock service (void method)
+        Mockito.doNothing().when(postService).deletePostById(postId);
+
+        // Act & Assert
+        mockMvc.perform(delete("/api/posts/{id}", postId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Post entity deleted successfully"));
+    }
     // ----------- Invalid Test -----------
     @Test
     public void testCreatePost_InvalidRequest_ReturnsBadRequest() throws Exception {
@@ -191,5 +205,20 @@ public class PostControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
+    }
+
+    @Test
+    public void testDeletePost_InvalidId_ReturnsNotFound() throws Exception {
+        // Arrange
+        long invalidPostId = 999L;
+
+        // Mock service to throw exception
+        Mockito.doThrow(new ResourceNotFoundException("Post","id",invalidPostId))
+                .when(postService).deletePostById(invalidPostId);
+
+        // Act & Assert
+        mockMvc.perform(delete("/api/posts/{id}", invalidPostId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }
