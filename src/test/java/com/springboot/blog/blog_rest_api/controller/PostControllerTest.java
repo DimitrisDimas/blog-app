@@ -2,9 +2,12 @@ package com.springboot.blog.blog_rest_api.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.springboot.blog.blog_rest_api.dto.CategoryDto;
 import com.springboot.blog.blog_rest_api.dto.PostDto;
 import com.springboot.blog.blog_rest_api.dto.PostResponse;
+import com.springboot.blog.blog_rest_api.exception.ResourceNotFoundException;
 import com.springboot.blog.blog_rest_api.security.JwtTokenProvider;
+import com.springboot.blog.blog_rest_api.service.CategoryService;
 import com.springboot.blog.blog_rest_api.service.PostService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,6 +39,9 @@ public class PostControllerTest {
 
     @MockitoBean
     private PostService postService;
+
+    @MockitoBean
+    private CategoryService categoryService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -128,6 +134,31 @@ public class PostControllerTest {
                 .andExpect(jsonPath("$.last").value(true));
     }
 
+    @Test
+    public void testGetPostById_ValidId_ReturnsPost() throws Exception {
+        // Arrange
+        long postId = 1L;
+
+        PostDto postDto = new PostDto();
+        postDto.setId(postId);
+        postDto.setTitle("My First Post");
+        postDto.setDescription("This is the description of my first post.");
+        postDto.setContent("This is the content of my first post.");
+        postDto.setCategoryId(1L);
+
+        // Mock service
+        Mockito.when(postService.getPostById(postId)).thenReturn(postDto);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/posts/{id}", postId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(postId))
+                .andExpect(jsonPath("$.title").value("My First Post"))
+                .andExpect(jsonPath("$.description").value("This is the description of my first post."))
+                .andExpect(jsonPath("$.content").value("This is the content of my first post."))
+                .andExpect(jsonPath("$.categoryId").value(1));
+    }
 
     // ----------- Invalid Test -----------
     @Test
@@ -146,4 +177,19 @@ public class PostControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void testGetPostById_InvalidId_ReturnsNotFound() throws Exception {
+        // Arrange
+        long invalidPostId = 999L;
+
+        // Mock service to throw exception
+        Mockito.when(postService.getPostById(invalidPostId))
+                .thenThrow(new ResourceNotFoundException("Post","id",invalidPostId));
+
+        // Act & Assert
+        mockMvc.perform(get("/api/posts/{id}", invalidPostId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+    }
 }
