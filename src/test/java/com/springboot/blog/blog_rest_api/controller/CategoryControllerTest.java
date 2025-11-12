@@ -2,6 +2,7 @@ package com.springboot.blog.blog_rest_api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springboot.blog.blog_rest_api.dto.CategoryDto;
+import com.springboot.blog.blog_rest_api.exception.ResourceNotFoundException;
 import com.springboot.blog.blog_rest_api.security.JwtTokenProvider;
 import com.springboot.blog.blog_rest_api.service.CategoryService;
 import org.junit.jupiter.api.Test;
@@ -83,7 +84,7 @@ public class CategoryControllerTest {
                 .andExpect(jsonPath("$.description").value("Tech category"));
     }
 
-    
+
     //Invalid Test
 
     @Test
@@ -100,7 +101,20 @@ public class CategoryControllerTest {
     }
 
 
+    @Test
+    public void testGetCategoryByInvalidId_ReturnsCategory() throws Exception {
+        // Arrange
+        long categoryId = 999L;
 
+        // Mock service to throw an exception (assuming you throw ResourceNotFoundException)
+        Mockito.when(categoryService.getCategory(categoryId))
+                .thenThrow(new ResourceNotFoundException("Category","id",categoryId));
+
+        // Act & Assert
+        mockMvc.perform(get("/api/categories/{category_id}", categoryId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 
 
 
