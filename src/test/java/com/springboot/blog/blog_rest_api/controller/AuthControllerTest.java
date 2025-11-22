@@ -129,7 +129,7 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.accessToken").isNotEmpty());
     }
 
-    // 2 Missing Password (401)
+    // 2 Missing Password (400)
     @Test
     public void testLogin_MissingPassword() throws Exception {
         AddUserToDB();
@@ -142,6 +142,22 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+
+
+    // 3 Invalid Password (401)
+    @Test
+    public void testLogin_InvalidCredentials() throws Exception {
+
+        AddUserToDB();
+        LoginDto loginDto = new LoginDto();
+        loginDto.setUsernameOrEmail("john123");
+        loginDto.setPassword("wrongpassword");
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDto)))
+                .andExpect(status().isUnauthorized());
+    }
 
     // ---------------- Helper method to create DTO ----------------
     private RegisterDto createValidRegisterDto(String username, String email) {
