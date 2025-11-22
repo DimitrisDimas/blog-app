@@ -90,6 +90,24 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    // 4 Duplicate username/email test
+    @Test
+    public void testRegisterUser_DuplicateUsername() throws Exception {
+        // Create first user
+        RegisterDto dto = createValidRegisterDto("john123", "john@example.com");
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated());
+
+        // Create second user with the same username
+        RegisterDto dtoDuplicate = createValidRegisterDto("john123", "john2@example.com");
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dtoDuplicate)))
+                .andExpect(status().isConflict());
+    }
 
     // ---------------- Helper method to create DTO ----------------
     private RegisterDto createValidRegisterDto(String username, String email) {
