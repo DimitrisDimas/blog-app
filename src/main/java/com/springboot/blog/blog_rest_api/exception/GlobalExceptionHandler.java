@@ -39,6 +39,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorDetails> handleInvalidCredentialsException(InvalidCredentialsException exception,
+                                                                            WebRequest webRequest){
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(),
+                webRequest.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+    }
+
 
     //Everytime is called the BlogAPIException the program will show only the necessary information
     @ExceptionHandler(BlogAPIException.class)
