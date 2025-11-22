@@ -4,6 +4,7 @@ import com.springboot.blog.blog_rest_api.dto.LoginDto;
 import com.springboot.blog.blog_rest_api.dto.RegisterDto;
 import com.springboot.blog.blog_rest_api.entity.Role;
 import com.springboot.blog.blog_rest_api.entity.User;
+import com.springboot.blog.blog_rest_api.exception.ResourceAlreadyExistsException;
 import com.springboot.blog.blog_rest_api.repository.RoleRepository;
 import com.springboot.blog.blog_rest_api.repository.UserRepository;
 import com.springboot.blog.blog_rest_api.security.JwtTokenProvider;
@@ -42,6 +43,16 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String register(RegisterDto registerDto) {
+
+        // Check if username already exists
+        if (userRepository.existsByUsername(registerDto.getUsername())) {
+            throw new ResourceAlreadyExistsException("User","username",registerDto.getUsername());
+        }
+
+        // Check if email already exists
+        if (userRepository.existsByEmail(registerDto.getEmail())) {
+            throw new ResourceAlreadyExistsException("User","email",registerDto.getEmail());
+        }
 
 
         //TODO REFACTOR (MODEL MAPPER)
