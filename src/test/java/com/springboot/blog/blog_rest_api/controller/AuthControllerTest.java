@@ -1,6 +1,7 @@
 package com.springboot.blog.blog_rest_api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.springboot.blog.blog_rest_api.dto.LoginDto;
 import com.springboot.blog.blog_rest_api.dto.RegisterDto;
 import com.springboot.blog.blog_rest_api.entity.Role;
 import com.springboot.blog.blog_rest_api.entity.User;
@@ -15,10 +16,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest
@@ -109,6 +112,28 @@ public class AuthControllerTest {
                 .andExpect(status().isConflict());
     }
 
+
+    @Test
+    public void testLogin_Success() throws Exception {
+
+        AddUserToDB();
+
+        LoginDto loginDto = new LoginDto();
+        loginDto.setUsernameOrEmail("john123");
+        loginDto.setPassword("12345");
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").isNotEmpty());
+    }
+
+
+
+
+
+
     // ---------------- Helper method to create DTO ----------------
     private RegisterDto createValidRegisterDto(String username, String email) {
         RegisterDto dto = new RegisterDto();
@@ -119,4 +144,14 @@ public class AuthControllerTest {
         return dto;
     }
 
+    private void AddUserToDB(){
+        User user = new User();
+        user.setName("John Doe");
+        user.setUsername("john123");
+        user.setEmail("john@example.com");
+        user.setPassword(passwordEncoder.encode("12345"));
+        Role roleUser = roleRepository.findByName("ROLE_USER").get();
+        user.setRoles(Set.of(roleUser));
+        userRepository.save(user);
+    }
 }
