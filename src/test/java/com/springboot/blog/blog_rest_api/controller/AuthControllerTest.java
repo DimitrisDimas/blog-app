@@ -68,7 +68,27 @@ public class AuthControllerTest {
         assertTrue(user.getRoles().stream().anyMatch(r -> r.getName().equals("ROLE_USER")));
     }
 
+    // 2 Validation errors test
+    @Test
+    public void testRegisterUser_InvalidUsername() throws Exception {
+        RegisterDto dto = createValidRegisterDto("abc", "invalid@example.com"); // username < 5 chars
 
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    // 3 Validation errors test
+    @Test
+    public void testRegisterUser_InvalidEmail() throws Exception {
+        RegisterDto dto = createValidRegisterDto("validUser", "invalid-email"); // invalid email
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
+    }
 
 
     // ---------------- Helper method to create DTO ----------------
