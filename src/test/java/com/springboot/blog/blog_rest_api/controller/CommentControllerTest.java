@@ -92,7 +92,6 @@ public class CommentControllerTest {
 
 
         String token = loginAndGetToken("Masatos", "12345");
-
         CommentDto commentDto = new CommentDto();
         commentDto.setName("Jane Doe");
         commentDto.setEmail("jane@example.com");
@@ -106,10 +105,27 @@ public class CommentControllerTest {
     }
 
 
+    // 3 Invalid postId (404)
+    @Test
+    public void testCreateComment_InvalidPostId() throws Exception {
+
+        String token = loginAndGetToken("Masatos", "12345");
+        CommentDto commentDto = new CommentDto();
+        commentDto.setName("Jane Doe");
+        commentDto.setEmail("jane@example.com");
+        commentDto.setBody("This is a valid comment body with more than 10 characters");
+
+        mockMvc.perform(post("/api/posts/" + 10 + "/comments")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(commentDto)))
+                .andExpect(status().isNotFound());
+    }
+
     private String loginAndGetToken(String username, String password) throws Exception {
         LoginDto loginDto = new LoginDto();
-        loginDto.setUsernameOrEmail("Masatos");
-        loginDto.setPassword("12345");
+        loginDto.setUsernameOrEmail(username);
+        loginDto.setPassword(password);
 
         String loginResponse = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
