@@ -128,6 +128,14 @@ public class CommentControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    // 4 Create Comment Unauthorized (401)
+    @Test
+    public void testCreateComment_Unauthorized() throws Exception {
+
+        mockMvc.perform(post("/api/posts/" + post.getId() + "/comments/" + comment.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
 
     // 1 Get Comment by id (200)
     @Test
@@ -243,6 +251,15 @@ public class CommentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateCommentDto)))
                 .andExpect(status().isNotFound());
+    }
+
+    // 5 Update Comment Unauthorized (401)
+    @Test
+    public void testUpdateComment_Unauthorized() throws Exception {
+
+        mockMvc.perform(put("/api/posts/" + post.getId() + "/comments/" + comment.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
     }
 
 
