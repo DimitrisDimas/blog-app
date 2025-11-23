@@ -209,7 +209,7 @@ public class CommentControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    // 3 Update Comment with Invalid ID (400)
+    // 3 Update Comment with Invalid comment ID (400)
     @Test
     public void testUpdateComment_CommentNotFound() throws Exception {
 
@@ -221,6 +221,24 @@ public class CommentControllerTest {
         updateCommentDto.setBody("This is an updated comment body with more than 10 characters");
 
         mockMvc.perform(put("/api/posts/" + post.getId() + "/comments/" + 10)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateCommentDto)))
+                .andExpect(status().isNotFound());
+    }
+
+    // 4 Update Comment with Invalid post ID (400)
+    @Test
+    public void testUpdateComment_PostNotFound() throws Exception {
+
+        String token = loginAndGetToken("Masatos", "12345");
+
+        CommentDto updateCommentDto = new CommentDto();
+        updateCommentDto.setName("Name");
+        updateCommentDto.setEmail("email@example.com");
+        updateCommentDto.setBody("This is an updated comment body with more than 10 characters");
+
+        mockMvc.perform(put("/api/posts/" + 10 + "/comments/" + comment.getId())
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateCommentDto)))
