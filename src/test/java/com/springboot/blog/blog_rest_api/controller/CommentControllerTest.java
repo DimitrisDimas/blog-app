@@ -142,7 +142,31 @@ public class CommentControllerTest {
                 .andExpect(jsonPath("$.email").value("jane@example.com"))
                 .andExpect(jsonPath("$.body").value("This is a comment body with more than 10 characters"));
     }
-    
+
+    // 2 Get Comment by id - invalid post id(404)
+    @Test
+    public void testGetCommentById_InvalidPostId() throws Exception {
+
+        String token = loginAndGetToken("Masatos", "12345");
+        Long commentId = comment.getId();
+        mockMvc.perform(get("/api/posts/" + 10 + "/comments/" + commentId)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    // 3 Get Comment by id - invalid comment id(404)
+    @Test
+    public void testGetCommentById_InvalidCommentId() throws Exception {
+
+        String token = loginAndGetToken("Masatos", "12345");
+        Long commentId = comment.getId();
+        mockMvc.perform(get("/api/posts/" + post.getId() + "/comments/" + 100)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
 
 
 
