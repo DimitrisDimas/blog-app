@@ -19,6 +19,8 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -50,7 +52,9 @@ public class CommentControllerTest {
     @Autowired
     private CommentRepository commentRepository;
 
-    Post post;
+    private Post post;
+
+    private Comment comment;
 
     @BeforeEach
     public void setup() {
@@ -86,7 +90,7 @@ public class CommentControllerTest {
                 .andExpect(jsonPath("$.body").value("This is a valid comment body with more than 10 characters"));
     }
 
-    // 2 Invalid Body (400)
+    // 2 Create Comment with Invalid Body (400)
     @Test
     public void testCreateComment_InvalidBody() throws Exception {
 
@@ -105,7 +109,7 @@ public class CommentControllerTest {
     }
 
 
-    // 3 Invalid postId (404)
+    // 3 Create Comment with Invalid postId (404)
     @Test
     public void testCreateComment_InvalidPostId() throws Exception {
 
@@ -121,6 +125,30 @@ public class CommentControllerTest {
                         .content(objectMapper.writeValueAsString(commentDto)))
                 .andExpect(status().isNotFound());
     }
+
+
+    // 1 Get Comment by id (200)
+    @Test
+    public void testGetCommentById_Success() throws Exception {
+
+        String token = loginAndGetToken("Masatos", "12345");
+        Long commentId = comment.getId();
+        mockMvc.perform(get("/api/posts/" + post.getId() + "/comments/" + commentId)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(commentId))
+                .andExpect(jsonPath("$.name").value("Jane Doe"))
+                .andExpect(jsonPath("$.email").value("jane@example.com"))
+                .andExpect(jsonPath("$.body").value("This is a comment body with more than 10 characters"));
+    }
+    
+
+
+
+
+
+    // Refactor and helper methods
 
     private String loginAndGetToken(String username, String password) throws Exception {
         LoginDto loginDto = new LoginDto();
@@ -165,7 +193,7 @@ public class CommentControllerTest {
         post.setCategory(category);
         post = postRepository.save(post);
 
-        Comment comment = new Comment();
+        comment = new Comment();
         comment.setName("Jane Doe");
         comment.setEmail("jane@example.com");
         comment.setBody("This is a comment body with more than 10 characters");
