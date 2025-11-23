@@ -20,6 +20,8 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -167,7 +169,27 @@ public class CommentControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    //Update comment by ID (200)
+    @Test
+    public void testUpdateComment_Success() throws Exception {
 
+        String token = loginAndGetToken("Masatos", "12345");
+
+        CommentDto updateCommentDto = new CommentDto();
+        updateCommentDto.setName("Updated Name");
+        updateCommentDto.setEmail("updated@example.com");
+        updateCommentDto.setBody("This is an updated comment body with more than 10 characters");
+
+        mockMvc.perform(put("/api/posts/" + post.getId() + "/comments/" + comment.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateCommentDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(comment.getId()))
+                .andExpect(jsonPath("$.name").value("Updated Name"))
+                .andExpect(jsonPath("$.email").value("updated@example.com"))
+                .andExpect(jsonPath("$.body").value("This is an updated comment body with more than 10 characters"));
+    }
 
 
 
