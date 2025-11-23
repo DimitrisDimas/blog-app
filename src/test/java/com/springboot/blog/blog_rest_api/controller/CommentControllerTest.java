@@ -278,11 +278,21 @@ public class CommentControllerTest {
 
         String token = loginAndGetToken("Masatos", "12345");
 
-        mockMvc.perform(delete("/api/posts/9999/comments/" + comment.getId()) 
+        mockMvc.perform(delete("/api/posts/9999/comments/" + comment.getId())
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
+
+    // 4 Delete Comment Unauthorized (401)
+    @Test
+    public void testDeleteComment_Unauthorized() throws Exception {
+
+        mockMvc.perform(delete("/api/posts/" + post.getId() + "/comments/" + comment.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
+
 
     // Refactor and helper methods
 
