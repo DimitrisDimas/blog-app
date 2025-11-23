@@ -86,6 +86,26 @@ public class CommentControllerTest {
                 .andExpect(jsonPath("$.body").value("This is a valid comment body with more than 10 characters"));
     }
 
+    // 2 Invalid Body (400)
+    @Test
+    public void testCreateComment_InvalidBody() throws Exception {
+
+
+        String token = loginAndGetToken("Masatos", "12345");
+
+        CommentDto commentDto = new CommentDto();
+        commentDto.setName("Jane Doe");
+        commentDto.setEmail("jane@example.com");
+        commentDto.setBody("");
+
+        mockMvc.perform(post("/api/posts/" + post.getId() + "/comments")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(commentDto)))
+                .andExpect(status().isBadRequest());
+    }
+
+
     private String loginAndGetToken(String username, String password) throws Exception {
         LoginDto loginDto = new LoginDto();
         loginDto.setUsernameOrEmail("Masatos");
