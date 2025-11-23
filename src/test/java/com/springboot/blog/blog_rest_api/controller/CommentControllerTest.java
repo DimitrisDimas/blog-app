@@ -266,12 +266,23 @@ public class CommentControllerTest {
 
         String token = loginAndGetToken("Masatos", "12345");
 
-        mockMvc.perform(delete("/api/posts/" + post.getId() + "/comments/9999") 
+        mockMvc.perform(delete("/api/posts/" + post.getId() + "/comments/9999")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
+    // 3 Delete Comment with Invalid Post ID (404)
+    @Test
+    public void testDeleteComment_PostNotFound() throws Exception {
+
+        String token = loginAndGetToken("Masatos", "12345");
+
+        mockMvc.perform(delete("/api/posts/9999/comments/" + comment.getId()) 
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 
     // Refactor and helper methods
 
