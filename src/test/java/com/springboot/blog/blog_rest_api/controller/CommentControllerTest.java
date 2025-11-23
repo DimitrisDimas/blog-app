@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -245,6 +245,20 @@ public class CommentControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+
+    // 1 Delete Comment by ID (200)
+    @Test
+    public void testDeleteComment_Success() throws Exception {
+
+        String token = loginAndGetToken("Masatos", "12345");
+
+        mockMvc.perform(delete("/api/posts/" + post.getId() + "/comments/" + comment.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        assertFalse(commentRepository.findById(comment.getId()).isPresent());
+    }
 
 
 
