@@ -4,12 +4,15 @@ import com.springboot.blog.blog_rest_api.dto.LoginDto;
 import com.springboot.blog.blog_rest_api.dto.RegisterDto;
 import com.springboot.blog.blog_rest_api.entity.Role;
 import com.springboot.blog.blog_rest_api.entity.User;
+import com.springboot.blog.blog_rest_api.exception.InvalidCredentialsException;
+import com.springboot.blog.blog_rest_api.exception.ResourceAlreadyExistsException;
 import com.springboot.blog.blog_rest_api.repository.RoleRepository;
 import com.springboot.blog.blog_rest_api.repository.UserRepository;
 import com.springboot.blog.blog_rest_api.security.JwtTokenProvider;
 import com.springboot.blog.blog_rest_api.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,6 +46,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String register(RegisterDto registerDto) {
 
+        // Check if username already exists
+        if (userRepository.existsByUsername(registerDto.getUsername())) {
+            throw new ResourceAlreadyExistsException("User","username",registerDto.getUsername());
+        }
+
+        // Check if email already exists
+        if (userRepository.existsByEmail(registerDto.getEmail())) {
+            throw new ResourceAlreadyExistsException("User","email",registerDto.getEmail());
+        }
+
 
         //TODO REFACTOR (MODEL MAPPER)
         User user = new User();
@@ -62,14 +75,20 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String login(LoginDto loginDto) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginDto.getUsernameOrEmail(),
+                            loginDto.getPassword()
+                    )
+            );
 
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginDto.getUsernameOrEmail(),loginDto.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            return jwtTokenProvider.generateToken(authentication);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String token = jwtTokenProvider.generateToken(authentication);
-
-        return token;
+        } catch (BadCredentialsException ex) {
+            throw new InvalidCredentialsException("Invalid username or password");
+        }
     }
+
 }
