@@ -53,7 +53,7 @@ public class AuthControllerTest {
         }
     }
 
-    // 1 Success test
+    // Created (201)
     @Test
     public void testRegisterUser_Success() throws Exception {
         RegisterDto dto = createValidRegisterDto("john123", "john@example.com");
@@ -71,7 +71,7 @@ public class AuthControllerTest {
         assertTrue(user.getRoles().stream().anyMatch(r -> r.getName().equals("ROLE_USER")));
     }
 
-    // 2 Validation errors test
+    // Bad Request (400)
     @Test
     public void testRegisterUser_InvalidUsername() throws Exception {
         RegisterDto dto = createValidRegisterDto("abc", "invalid@example.com"); // username < 5 chars
@@ -82,7 +82,7 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    // 3 Validation errors test
+    // Bad Request (400)
     @Test
     public void testRegisterUser_InvalidEmail() throws Exception {
         RegisterDto dto = createValidRegisterDto("validUser", "invalid-email"); // invalid email
@@ -93,7 +93,7 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    // 4 Duplicate username/email test
+    // Conflict (409)
     @Test
     public void testRegisterUser_DuplicateUsername() throws Exception {
         // Create first user
@@ -112,7 +112,9 @@ public class AuthControllerTest {
                 .andExpect(status().isConflict());
     }
 
-    // 1 Success Login (200)
+    //-----------------------------------------------------------------------
+
+    //  Success (200)
     @Test
     public void testLogin_Success() throws Exception {
 
@@ -129,7 +131,7 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.accessToken").isNotEmpty());
     }
 
-    // 2 Missing Password (400)
+    //  Bad Request (400)
     @Test
     public void testLogin_MissingPassword() throws Exception {
         AddUserToDB();
@@ -142,9 +144,7 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-
-
-    // 3 Invalid Password (401)
+    // Unauthorized (401)
     @Test
     public void testLogin_InvalidCredentials() throws Exception {
 
@@ -159,7 +159,7 @@ public class AuthControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    // ---------------- Helper method to create DTO ----------------
+    // ---------------- Helper Methods ----------------
     private RegisterDto createValidRegisterDto(String username, String email) {
         RegisterDto dto = new RegisterDto();
         dto.setName("John Doe");
