@@ -7,7 +7,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "Authentication", description = "REST APIs for user authentication and registration")
 public interface AuthControllerDoc {
@@ -23,7 +25,7 @@ public interface AuthControllerDoc {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
-    ResponseEntity<String> register(RegisterDto registerDto);
+    ResponseEntity<String> register(@Valid @RequestBody RegisterDto registerDto);
 
     @Operation(
             summary = "Authenticate user and return JWT token",
@@ -36,5 +38,5 @@ public interface AuthControllerDoc {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
-    ResponseEntity<JWTAuthResponse> login(LoginDto loginDto);
+    ResponseEntity<JWTAuthResponse> login(@Valid @RequestBody LoginDto loginDto);
 }

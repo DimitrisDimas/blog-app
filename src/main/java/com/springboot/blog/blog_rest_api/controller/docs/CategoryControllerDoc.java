@@ -2,11 +2,16 @@ package com.springboot.blog.blog_rest_api.controller.docs;
 
 import com.springboot.blog.blog_rest_api.dto.CategoryDto;
 import com.springboot.blog.blog_rest_api.dto.CategoryResponse;
+import com.springboot.blog.blog_rest_api.utils.AppConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Category Management", description = "REST APIs for managing blog categories")
 public interface CategoryControllerDoc {
@@ -22,7 +27,7 @@ public interface CategoryControllerDoc {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
-    ResponseEntity<CategoryDto> addCategory(CategoryDto categoryDto);
+    ResponseEntity<CategoryDto> addCategory(@Valid @RequestBody CategoryDto categoryDto);
 
     @Operation(
             summary = "Retrieve category by ID",
@@ -34,7 +39,7 @@ public interface CategoryControllerDoc {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
-    ResponseEntity<CategoryDto> getCategory(long category_id);
+    ResponseEntity<CategoryDto> getCategory(@PathVariable("category_id") long category_id);
 
     @Operation(
             summary = "Retrieve all categories",
@@ -45,10 +50,10 @@ public interface CategoryControllerDoc {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
-    ResponseEntity<CategoryResponse> getCategories(int pageNo,
-                                                   int pageSize,
-                                                   String sortBy,
-                                                   String sortDir);
+    ResponseEntity<CategoryResponse> getCategories(@RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+                                                   @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+                                                   @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+                                                   @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir);
 
     @Operation(
             summary = "Update an existing category",
@@ -61,7 +66,8 @@ public interface CategoryControllerDoc {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
-    ResponseEntity<CategoryDto> updateCategory(long category_id, CategoryDto categoryDto);
+    ResponseEntity<CategoryDto> updateCategory(@PathVariable("category_id") long category_id,
+                                               @Valid @RequestBody CategoryDto categoryDto);
 
     @Operation(
             summary = "Delete a category",
@@ -73,5 +79,5 @@ public interface CategoryControllerDoc {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
-    ResponseEntity<String> deleteCategory(long category_id);
+    ResponseEntity<String> deleteCategory(@PathVariable("category_id") long category_id);
 }
