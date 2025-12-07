@@ -4,6 +4,8 @@ import com.springboot.blog.blog_rest_api.controller.docs.AuthControllerDoc;
 import com.springboot.blog.blog_rest_api.dto.JWTAuthResponse;
 import com.springboot.blog.blog_rest_api.dto.LoginDto;
 import com.springboot.blog.blog_rest_api.dto.RegisterDto;
+import com.springboot.blog.blog_rest_api.entity.User;
+import com.springboot.blog.blog_rest_api.repository.UserRepository;
 import com.springboot.blog.blog_rest_api.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,9 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController implements AuthControllerDoc {
 
     private AuthService authService;
+    private UserRepository userRepository;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, UserRepository userRepository) {
         this.authService = authService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping(value = {"/register","/signup"})
@@ -39,6 +43,12 @@ public class AuthController implements AuthControllerDoc {
         String token = authService.login(loginDto);
         JWTAuthResponse jwtAuthResponse = new JWTAuthResponse();
         jwtAuthResponse.setAccessToken(token);
+
+        String name = userRepository.getNameByUsername(loginDto.getUsernameOrEmail());
+
+
+        jwtAuthResponse.setName(name);
+
         return ResponseEntity.ok(jwtAuthResponse);
     }
 
