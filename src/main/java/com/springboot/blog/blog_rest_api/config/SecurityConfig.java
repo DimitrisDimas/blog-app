@@ -56,17 +56,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .cors(withDefaults())
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
-                        .anyRequest().authenticated()
-                ).exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(authenticationEntryPoint)
-                ).sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
+            .cors(withDefaults())
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                    .anyRequest().authenticated()
+            ).exceptionHandling(exception -> exception
+                    .authenticationEntryPoint(authenticationEntryPoint)
+            ).sessionManagement(session -> session
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            );
 
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
