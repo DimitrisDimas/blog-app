@@ -44,7 +44,7 @@ public class AuthController implements AuthControllerDoc {
         JWTAuthResponse jwtAuthResponse = new JWTAuthResponse();
         jwtAuthResponse.setAccessToken(token);
 
-        String name = userRepository.getNameByUsername(loginDto.getUsernameOrEmail());
+        String name = userRepository.getNameByUsername(loginDto.getUsername());
 
 
         jwtAuthResponse.setName(name);

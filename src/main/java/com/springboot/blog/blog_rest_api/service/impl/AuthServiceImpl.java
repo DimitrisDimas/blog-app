@@ -78,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            loginDto.getUsernameOrEmail(),
+                            loginDto.getUsername(),
                             loginDto.getPassword()
                     )
             );

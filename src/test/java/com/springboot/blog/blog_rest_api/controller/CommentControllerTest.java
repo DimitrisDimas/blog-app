@@ -315,7 +315,7 @@ public class CommentControllerTest {
 
     private String loginAndGetToken(String username, String password) throws Exception {
         LoginDto loginDto = new LoginDto();
-        loginDto.setUsernameOrEmail(username);
+        loginDto.setUsername(username);
         loginDto.setPassword(password);
 
         String loginResponse = mockMvc.perform(post("/api/auth/login")

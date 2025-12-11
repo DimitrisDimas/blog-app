@@ -121,7 +121,7 @@ public class AuthControllerTest {
         AddUserToDB();
 
         LoginDto loginDto = new LoginDto();
-        loginDto.setUsernameOrEmail("john123");
+        loginDto.setUsername("john123");
         loginDto.setPassword("12345");
 
         mockMvc.perform(post("/api/auth/login")
@@ -136,7 +136,7 @@ public class AuthControllerTest {
     public void testLogin_MissingPassword() throws Exception {
         AddUserToDB();
         LoginDto loginDto = new LoginDto();
-        loginDto.setUsernameOrEmail("john123");
+        loginDto.setUsername("john123");
         loginDto.setPassword("");
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -150,7 +150,7 @@ public class AuthControllerTest {
 
         AddUserToDB();
         LoginDto loginDto = new LoginDto();
-        loginDto.setUsernameOrEmail("john123");
+        loginDto.setUsername("john123");
         loginDto.setPassword("wrongpassword");
 
         mockMvc.perform(post("/api/auth/login")
